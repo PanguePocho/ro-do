@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ro-Do</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter',sans-serif;
+scroll-behavior:smooth;
+}
+
+body{
+background:#07070d;
+color:white;
+overflow-x:hidden;
+}
+
+body::before{
+content:'';
+position:fixed;
+width:700px;
+height:700px;
+background:radial-gradient(circle,#ff004c55,transparent 70%);
+top:-250px;
+right:-250px;
+z-index:-1;
+}
+
+body::after{
+content:'';
+position:fixed;
+width:700px;
+height:700px;
+background:radial-gradient(circle,#7b00ff55,transparent 70%);
+bottom:-250px;
+left:-250px;
+z-index:-1;
+}
+
+header{
+position:fixed;
+top:0;
+width:100%;
+padding:18px 40px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:#0b0b14dd;
+backdrop-filter:blur(20px);
+border-bottom:1px solid #ffffff10;
+z-index:1000;
+}
+
+.logo{
+font-size:32px;
+font-weight:800;
+background:linear-gradient(90deg,#ff004c,#7b00ff);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+nav{
+display:flex;
+gap:15px;
+align-items:center;
+}
+
+nav a, nav button{
+text-decoration:none;
+color:white;
+background:#ffffff10;
+border:none;
+padding:12px 18px;
+border-radius:14px;
+cursor:pointer;
+transition:0.3s;
+font-weight:600;
+}
+
+nav a:hover,
+nav button:hover{
+transform:translateY(-2px);
+background:linear-gradient(90deg,#ff004c,#7b00ff);
+}
+
+.hero{
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+padding:120px 20px 50px;
+}
+
+.hero-content{
+max-width:900px;
+}
+
+.hero h1{
+font-size:82px;
+line-height:1;
+margin-bottom:20px;
+font-weight:800;
+}
+
+.gradient{
+background:linear-gradient(90deg,#ff004c,#7b00ff);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.hero p{
+font-size:20px;
+line-height:1.8;
+color:#bbbbcc;
+margin-bottom:35px;
+}
+
+.hero-buttons{
+display:flex;
+gap:15px;
+justify-content:center;
+flex-wrap:wrap;
+}
+
+.primary-btn{
+background:linear-gradient(90deg,#ff004c,#7b00ff);
+padding:16px 24px;
+border:none;
+border-radius:18px;
+font-weight:700;
+font-size:16px;
+color:white;
+cursor:pointer;
+box-shadow:0 0 30px #7b00ff55;
+}
+
+.secondary-btn{
+background:#ffffff10;
+padding:16px 24px;
+border:none;
+border-radius:18px;
+font-weight:700;
+font-size:16px;
+color:white;
+cursor:pointer;
+}
+
+section{
+padding:100px 40px;
+}
+
+.section-title{
+font-size:42px;
+margin-bottom:20px;
+font-weight:800;
+}
+
+.section-sub{
+color:#bbbbcc;
+margin-bottom:50px;
+font-size:18px;
+}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:25px;
+}
+
+.card{
+background:#10101a;
+padding:28px;
+border-radius:26px;
+border:1px solid #ffffff10;
+transition:0.3s;
+}
+
+.card:hover{
+transform:translateY(-6px);
+box-shadow:0 0 40px #7b00ff22;
+}
+
+.card h3{
+font-size:24px;
+margin-bottom:12px;
+}
+
+.card p{
+color:#b8b8c7;
+line-height:1.7;
+}
+
+.upload-section{
+background:#0d0d17;
+border-top:1px solid #ffffff10;
+border-bottom:1px solid #ffffff10;
+}
+
+.upload-box{
+max-width:900px;
+margin:auto;
+background:#11111d;
+padding:35px;
+border-radius:28px;
+}
+
+input, select, textarea{
+width:100%;
+padding:16px;
+margin-top:15px;
+background:#1a1a28;
+border:none;
+color:white;
+border-radius:16px;
+font-size:15px;
+}
+
+.feed{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+gap:25px;
+margin-top:40px;
+}
+
+.project-card{
+background:#11111d;
+border-radius:24px;
+overflow:hidden;
+border:1px solid #ffffff10;
+transition:0.3s;
+}
+
+.project-card:hover{
+transform:scale(1.02);
+}
+
+.project-content{
+padding:22px;
+}
+
+.project-content h3{
+font-size:22px;
+margin-bottom:8px;
+}
+
+.project-content p{
+color:#b8b8c7;
+margin-bottom:16px;
+}
+
+.project-preview{
+height:220px;
+overflow:hidden;
+background:#000;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.project-preview img{
+width:100%;
+height:220px;
+object-fit:cover;
+}
+
+.project-preview video{
+width:100%;
+height:220px;
+object-fit:cover;
+}
+
+.project-preview audio{
+width:90%;
+margin:auto;
+}
+
+
+.project-actions{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.project-actions button{
+flex:1;
+padding:12px;
+border:none;
+border-radius:14px;
+background:#1c1c2c;
+color:white;
+font-weight:700;
+cursor:pointer;
+}
+
+.chat-widget{
+position:fixed;
+right:20px;
+bottom:20px;
+width:350px;
+background:#11111d;
+border:1px solid #ffffff15;
+border-radius:24px;
+padding:18px;
+backdrop-filter:blur(20px);
+box-shadow:0 0 40px #00000055;
+}
+
+.chat-widget h3{
+margin-bottom:15px;
+}
+
+.chat-messages{
+height:220px;
+overflow-y:auto;
+background:#0b0b14;
+padding:14px;
+border-radius:16px;
+margin-bottom:14px;
+}
+
+.message{
+margin-bottom:12px;
+padding:10px;
+background:#171727;
+border-radius:12px;
+}
+
+footer{
+padding:50px;
+text-align:center;
+color:#999;
+border-top:1px solid #ffffff10;
+}
+
+@media(max-width:768px){
+.hero h1{
+font-size:52px;
+}
+
+header{
+padding:16px;
+}
+
+section{
+padding:80px 20px;
+}
+
+.chat-widget{
+width:92%;
+right:4%;
+}
+}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">Ro-Do</div>
+
+<nav>
+<a href="#inicio">Inicio</a>
+<a href="#explorar">Obras</a>
+<a href="#subir">Subir</a>
+<a href="#comunidad">Comunidad</a>
+<button onclick="registrarse()">Registrarse</button>
+<button onclick="login()">Login</button>
+</nav>
+</header>
+
+<section class="hero" id="inicio">
+<div class="hero-content">
+<h1>
+La creatividad <span class="gradient">humana</span><br>
+vale más que una IA.
+</h1>
+
+<p>
+Ro-Do conecta artistas auténticos con inversores, productores y amantes del arte real.
+Subí música, ilustraciones, videos y proyectos creativos.
+</p>
+
+<div class="hero-buttons">
+<button class="primary-btn" onclick="document.getElementById('subir').scrollIntoView()">
+Subir proyecto
+</button>
+
+<button class="secondary-btn" onclick="document.getElementById('explorar').scrollIntoView()">
+Explorar obras
+</button>
+</div>
+</a>
+</div>
+</section>
+
+<section id="artistas">
+<h2 class="section-title">🎨 Artistas</h2>
+<p class="section-sub">
+Espacio dedicado a ilustradores, músicos, fotógrafos y artistas digitales.
+</p>
+</section>
+
+<section id="inversores">
+<h2 class="section-title">💸 Inversores</h2>
+<p class="section-sub">
+Descubrí proyectos auténticos y apoyá nuevas ideas creativas.
+</p>
+</section>
+
+<section id="audiovisual">
+<h2 class="section-title">🎬 Audiovisual</h2>
+<p class="section-sub">
+Conectá con productores, cineastas y creadores multimedia.
+</p>
+</section>
+
+<section id="explorar">
+<h2 class="section-title">Obras destacadas</h2>
+<p class="section-sub">
+Descubrí artistas reales y proyectos únicos.
+</p>
+
+<div class="feed" id="feed"></div>
+</section>
+
+<section class="upload-section" id="subir">
+<div class="upload-box">
+<h2 class="section-title">Subir proyecto</h2>
+<p class="section-sub">Publicá tu arte y conectá con inversores.</p>
+
+<input type="text" id="titulo" placeholder="Nombre del proyecto">
+
+<select id="tipo">
+<option value="imagen">Imagen</option>
+<option value="audio">MP3</option>
+<option value="video">MP4</option>
+</select>
+
+<textarea id="descripcion" placeholder="Descripción del proyecto"></textarea>
+
+<input type="file" id="archivo">
+
+<button class="primary-btn" style="width:100%;margin-top:15px;" onclick="subirProyecto()">
+Publicar proyecto
+</button>
+</div>
+</section>
+
+<section id="comunidad">
+<h2 class="section-title">La comunidad Ro-Do</h2>
+<p class="section-sub">Conectá artistas, productores e inversores.</p>
+
+<div class="cards">
+<a href="#artistas" style="text-decoration:none;color:white;">
+<div class="card">
+<h3>🎨 Artistas</h3>
+<p>Subí tus obras y conseguí apoyo para tus proyectos.</p>
+</div>
+</a>
+
+<a href="#inversores" style="text-decoration:none;color:white;">
+<div class="card">
+<h3>💸 Inversores</h3>
+<p>Encontrá talento auténtico antes que nadie.</p>
+</div>
+</a>
+
+<a href="#audiovisual" style="text-decoration:none;color:white;">
+<div class="card">
+<h3>🎬 Audiovisual</h3>
+<p>Conectá con músicos, diseñadores y productores.</p>
+</div>
+</div>
+</section>
+
+<button id="chatToggle" class="primary-btn" style="position:fixed;right:20px;bottom:20px;z-index:1001;">
+💬 Chat
+</button>
+
+<div class="chat-widget" id="chatWidget" style="display:none;">
+<h3>💬 Chat Global</h3>
+<div class="chat-messages" id="chat"></div>
+
+<input type="text" id="mensaje" placeholder="Escribí un mensaje...">
+
+<button class="primary-btn" style="width:100%;margin-top:10px;" onclick="enviarMensaje()">
+Enviar mensaje
+</button>
+</div>
+
+<footer>
+Ro-Do — Plataforma creativa para artistas reales.
+</footer>
+
+<script>
+const supabaseClient = supabase.createClient(
+"https://pycswdgiauktoakvlgot.supabase.co",
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5Y3N3ZGdpYXVrdG9ha3ZsZ290Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1OTAzMzIsImV4cCI6MjA5NDE2NjMzMn0.XKdpYPLEcJhQ112g43a-bepdbMk-ESW3gZ_aJbMF7Yo"
+);
+
+let usuario = null;
+
+async function registrarse(){
+const email = prompt("Email:");
+const password = prompt("Contraseña:");
+
+const { error } = await supabaseClient.auth.signUp({
+email,
+password
+});
+
+if(error){
+alert(error.message);
+}else{
+alert("Cuenta creada correctamente");
+}
+}
+
+async function login(){
+const email = prompt("Email:");
+const password = prompt("Contraseña:");
+
+const { data, error } = await supabaseClient.auth.signInWithPassword({
+email,
+password
+});
+
+if(error){
+alert(error.message);
+}else{
+usuario = data.user;
+alert("Bienvenido " + usuario.email);
+}
+}
+
+async function subirProyecto(){
+if(!usuario){
+alert("Primero iniciá sesión");
+return;
+}
+
+const titulo = document.getElementById("titulo").value;
+const tipo = document.getElementById("tipo").value;
+const archivo = document.getElementById("archivo").files[0];
+
+if(!archivo){
+alert("Seleccioná un archivo");
+return;
+}
+
+const nombre = Date.now() + archivo.name;
+
+const { error: uploadError } = await supabaseClient.storage
+.from("obras")
+.upload(nombre, archivo);
+
+if(uploadError){
+alert(uploadError.message);
+console.log(uploadError);
+return;
+}
+
+const { data: urlData } = supabaseClient.storage
+.from("obras")
+.getPublicUrl(nombre);
+
+const url = urlData.publicUrl;
+
+const feed = document.getElementById("feed");
+
+let media = "";
+
+if(tipo === "imagen"){
+media = `<img src="${url}">`;
+}
+
+if(tipo === "audio"){
+media = `<audio controls src="${url}"></audio>`;
+}
+
+if(tipo === "video"){
+media = `<video controls src="${url}"></video>`;
+}
+
+feed.innerHTML = `
+<div class="project-card">
+
+<div class="project-preview">
+
+${media}
+
+</div>
+
+<div class="project-content">
+
+<h3>${titulo}</h3>
+
+<p>
+por ${usuario.email}
+</p>
+
+<button class="primary-btn"
+onclick="abrirProyecto(
+'${titulo}',
+'${usuario.email}',
+'${url}',
+'${tipo}'
+)">
+Ver Proyecto
+</button>
+
+</div>
+
+</div>
+` + feed.innerHTML;
+
+alert("Proyecto publicado");
+}
+
+async function enviarMensaje(){
+const mensaje = document.getElementById("mensaje").value;
+
+if(mensaje.trim() === "") return;
+
+const chat = document.getElementById("chat");
+
+chat.innerHTML += `
+<div class="message">
+<b>Tú</b><br>
+${mensaje}
+</div>
+`;
+
+chat.scrollTop = chat.scrollHeight;
+
+document.getElementById("mensaje").value = "";
+}
+
+document.getElementById("chatToggle").addEventListener("click",()=>{
+const chat = document.getElementById("chatWidget");
+
+if(chat.style.display === "none"){
+chat.style.display = "block";
+}else{
+chat.style.display = "none";
+}
+
+});
+function abrirProyecto(titulo,usuario,url,tipo){
+
+let contenido = "";
+
+if(tipo === "imagen"){
+contenido = `
+<img src="${url}"
+style="
+width:100%;
+border-radius:20px;
+max-height:70vh;
+object-fit:contain;
+">
+`;
+}
+
+if(tipo === "audio"){
+contenido = `
+<audio controls
+src="${url}"
+style="width:100%;">
+</audio>
+`;
+}
+
+if(tipo === "video"){
+contenido = `
+<video controls
+src="${url}"
+style="
+width:100%;
+border-radius:20px;
+max-height:70vh;
+">
+</video>
+`;
+}
+
+const ventana = document.createElement("div");
+
+ventana.style.position = "fixed";
+ventana.style.top = "0";
+ventana.style.left = "0";
+ventana.style.width = "100%";
+ventana.style.height = "100%";
+ventana.style.background = "#000000dd";
+ventana.style.zIndex = "9999";
+ventana.style.display = "flex";
+ventana.style.justifyContent = "center";
+ventana.style.alignItems = "center";
+ventana.style.padding = "40px";
+
+ventana.innerHTML = `
+<div style="
+background:#11111d;
+padding:30px;
+border-radius:30px;
+max-width:900px;
+width:100%;
+max-height:90vh;
+overflow:auto;
+position:relative;
+border:1px solid #ffffff20;
+">
+
+<button onclick="this.parentElement.parentElement.remove()"
+style="
+position:absolute;
+top:15px;
+right:15px;
+background:#ff004c;
+border:none;
+color:white;
+padding:10px 14px;
+border-radius:12px;
+cursor:pointer;
+font-weight:bold;
+">
+X
+</button>
+
+<h1 style="
+margin-bottom:10px;
+font-size:42px;
+">
+${titulo}
+</h1>
+
+<p style="
+margin-bottom:20px;
+color:#aaa;
+">
+por ${usuario}
+</p>
+
+${contenido}
+
+<div style="
+display:flex;
+gap:10px;
+margin-top:25px;
+flex-wrap:wrap;
+">
+
+<button class="primary-btn">
+💸 Invertir
+</button>
+
+<button class="secondary-btn">
+💬 Contactar artista
+</button>
+
+<button class="secondary-btn">
+❤️ Like
+</button>
+
+</div>
+
+</div>
+`;
+
+document.body.appendChild(ventana);
+
+}
+</script>
+</body>
+</html>
