@@ -573,6 +573,16 @@ const { data: urlData } = supabaseClient.storage
 
 const url = urlData.publicUrl;
 
+await supabaseClient
+.from("obras")
+.insert([
+{
+titulo: titulo,
+tipo: tipo,
+url: url,
+usuario: usuario.email
+}
+]);
 const feed = document.getElementById("feed");
 
 let media = "";
@@ -643,6 +653,68 @@ chat.scrollTop = chat.scrollHeight;
 document.getElementById("mensaje").value = "";
 }
 
+async function cargarObras(){
+
+const { data } = await supabaseClient
+.from("obras")
+.select("*")
+.order("id",{ascending:false});
+
+const feed = document.getElementById("feed");
+
+feed.innerHTML = "";
+
+data.forEach(o=>{
+
+let media = "";
+
+if(o.tipo === "imagen"){
+media = `<img src="${o.url}">`;
+}
+
+if(o.tipo === "audio"){
+media = `<audio controls src="${o.url}"></audio>`;
+}
+
+if(o.tipo === "video"){
+media = `<video controls src="${o.url}"></video>`;
+}
+
+feed.innerHTML += `
+<div class="project-card">
+
+<div class="project-preview">
+${media}
+</div>
+
+<div class="project-content">
+
+<h3>${o.titulo}</h3>
+
+<p>
+por ${o.usuario}
+</p>
+
+<button class="primary-btn"
+onclick="abrirProyecto(
+'${o.titulo}',
+'${o.usuario}',
+'${o.url}',
+'${o.tipo}'
+)">
+Ver Proyecto
+</button>
+
+</div>
+
+</div>
+`;
+
+});
+
+}
+
+cargarObras();
 document.getElementById("chatToggle").addEventListener("click",()=>{
 const chat = document.getElementById("chatWidget");
 
